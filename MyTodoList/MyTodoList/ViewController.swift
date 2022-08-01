@@ -125,5 +125,33 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
             //処理なし
         }
     }
+    
+    //セルが編集可能であるかどうかを返却する
+    func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
+        return true
+    }
+    
+    //セルを削除した時の処理
+    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
+        //削除処理かどうか
+        if editingStyle == UITableViewCell.EditingStyle.delete{
+            //ToDoリストから削除
+            todoList.remove(at: indexPath.row)
+            //セルを削除
+            tableView.deleteRows(at: [indexPath], with: UITableView.RowAnimation.fade)
+            
+            //データ保存。Data型にシリアライズする
+            do{
+                let data:Data = try NSKeyedArchiver.archivedData(withRootObject: todoList, requiringSecureCoding: true)
+            
+                //UserDefaultsに保存
+                let userDefaults = UserDefaults.standard
+                userDefaults.set(data, forKey: "todoList")
+                userDefaults.synchronize()
+            }catch{
+                //処理なし
+            }
+        }
+    }
 }
 
